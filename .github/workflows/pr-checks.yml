@@ -1,0 +1,51 @@
+name: PR checks
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  naming:
+    name: Jira key in PR title and branch
+    # Dependabot PRs have their own names, so skip them.
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title and branch name
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          ok=true
+          if ! printf '%s' "$PR_TITLE" | grep -Eq '^MDH-[0-9]+ '; then
+            echo "::error::PR title must start with a Jira key, for example: 'MDH-12 Add login API'"
+            ok=false
+          fi
+          if ! printf '%s' "$BRANCH" | grep -Eq '^(feature|fix|docs|chore)/MDH-[0-9]+-[a-z0-9-]+$'; then
+            echo "::error::Branch name must look like 'feature/MDH-12-short-name' (feature, fix, docs or chore)"
+            ok=false
+          fi
+          if [ "$ok" = true ]; then
+            echo "Naming looks good."
+          else
+            exit 1
+          fi
+
+  secrets:
+    name: No .env file committed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for .env files
+        run: |
+          found="$(git ls-files | grep -E '(^|/)\.env($|\.)' | grep -v '\.env\.example$' || true)"
+          if [ -n "$found" ]; then
+            echo "::error::Remove these files from the repo: $found"
+            exit 1
+          fi
+          echo "No .env files found."
+
+  # Add build, lint and test jobs here after the tech stack is decided (ADR-0002).

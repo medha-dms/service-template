@@ -1,0 +1,19 @@
+version: 2
+updates:
+  # Keep GitHub Actions versions up to date.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "type: chore"
+
+  # Add your language here after the tech stack is decided, for example:
+  # - package-ecosystem: npm        # or pip, maven, gradle, gomod
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #   labels:
+  #     - "type: chore"

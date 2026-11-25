@@ -1,0 +1,33 @@
+openapi: 3.0.3
+info:
+  title: SERVICE-NAME API
+  version: 0.1.0
+  description: |
+    API contract for SERVICE-NAME.
+    Change this file in a pull request before you change the code.
+servers:
+  - url: http://localhost:8080
+    description: Local
+paths:
+  /health:
+    get:
+      summary: Check that the service is running
+      operationId: getHealth
+      tags: [system]
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
